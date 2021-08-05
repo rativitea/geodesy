@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart'
+    as google_maps_latlng;
 
 /// The main geodesy class
 class Geodesy {
@@ -7,8 +9,8 @@ class Geodesy {
   final num _PI = math.pi;
 
   /// calculate a destination point given the distance and bearing
-  LatLng destinationPointByDistanceAndBearing(
-      LatLng l, num distance, num bearing,
+  google_maps_latlng.LatLng destinationPointByDistanceAndBearing(
+      google_maps_latlng.LatLng l, num distance, num bearing,
       [num? radius]) {
     radius = radius ?? _RADIUS;
 
@@ -31,12 +33,13 @@ class Geodesy {
     var y = sinBearingRadians * sinAngularDistanceRadius * cosLatRadians;
     var x = cosAngularDistanceRadius - sinLatRadians * sinLatRadians2;
     num lngRadians2 = lngRadians + math.atan2(y, x);
-    return LatLng(radianToDeg(latRadians2 as double),
+    return google_maps_latlng.LatLng(radianToDeg(latRadians2 as double),
         (radianToDeg(lngRadians2 as double) + 540) % 360 - 180);
   }
 
   /// calcuate the midpoint bewteen teo geo points
-  LatLng midPointBetweenTwoGeoPoints(LatLng l1, LatLng l2) {
+  google_maps_latlng.LatLng midPointBetweenTwoGeoPoints(
+      google_maps_latlng.LatLng l1, google_maps_latlng.LatLng l2) {
     num l1LatRadians = degToRadian(l1.latitude);
     num l1LngRadians = degToRadian(l1.longitude);
     num l2LatRadians = degToRadian(l2.latitude);
@@ -53,12 +56,13 @@ class Geodesy {
     num lngRadians =
         l1LngRadians + math.atan2(vectorY, math.cos(l1LatRadians) + vectorX);
 
-    return LatLng(radianToDeg(latRadians as double),
+    return google_maps_latlng.LatLng(radianToDeg(latRadians as double),
         (radianToDeg(lngRadians as double) + 540) % 360 - 180);
   }
 
   /// calculate the geo point of intersection of two given paths
-  LatLng? intersectionByPaths(LatLng l1, LatLng l2, num b1, num b2) {
+  google_maps_latlng.LatLng? intersectionByPaths(google_maps_latlng.LatLng l1,
+      google_maps_latlng.LatLng l2, num b1, num b2) {
     num l1LatRadians = degToRadian(l1.latitude);
     num l1LngRadians = degToRadian(l1.longitude);
     num l2LatRadians = degToRadian(l2.latitude);
@@ -110,12 +114,14 @@ class Geodesy {
         math.cos(dst13) - math.sin(l1LatRadians) * math.sin(lat3));
     var l3LngRadians = l1LngRadians + lngRadiansDiff13;
 
-    return LatLng(radianToDeg(lat3 as double),
+    return google_maps_latlng.LatLng(radianToDeg(lat3 as double),
         (radianToDeg(l3LngRadians as double) + 540) % 360 - 180);
   }
 
   /// calculate the distance in meters between two geo points
-  num distanceBetweenTwoGeoPoints(LatLng l1, LatLng l2, [num? radius]) {
+  num distanceBetweenTwoGeoPoints(
+      google_maps_latlng.LatLng l1, google_maps_latlng.LatLng l2,
+      [num? radius]) {
     radius = radius ?? _RADIUS;
     var R = radius;
     num l1LatRadians = degToRadian(l1.latitude);
@@ -137,7 +143,8 @@ class Geodesy {
   }
 
   /// calculate the bearing from point l1 to point l2
-  num bearingBetweenTwoGeoPoints(LatLng l1, LatLng l2) {
+  num bearingBetweenTwoGeoPoints(
+      google_maps_latlng.LatLng l1, google_maps_latlng.LatLng l2) {
     num l1LatRadians = degToRadian(l1.latitude);
     num l2LatRadians = degToRadian(l2.latitude);
     num lngRadiansDiff = degToRadian(l2.longitude - l1.longitude);
@@ -152,13 +159,16 @@ class Geodesy {
   }
 
   /// calculate the final bearing from point l1 to point l2
-  num finalBearingBetweenTwoGeoPoints(LatLng l1, LatLng l2) {
+  num finalBearingBetweenTwoGeoPoints(
+      google_maps_latlng.LatLng l1, google_maps_latlng.LatLng l2) {
     return (bearingBetweenTwoGeoPoints(l2, l1) + 180) % 360;
   }
 
   /// calculate signed distance from a geo point
   /// to greate circle with start and end points
-  num crossTrackDistanceTo(LatLng l1, LatLng start, LatLng end, [num? radius]) {
+  num crossTrackDistanceTo(google_maps_latlng.LatLng l1,
+      google_maps_latlng.LatLng start, google_maps_latlng.LatLng end,
+      [num? radius]) {
     var R = radius ?? _RADIUS;
 
     num distStartL1 = distanceBetweenTwoGeoPoints(start, l1, R) / R;
@@ -174,7 +184,10 @@ class Geodesy {
   }
 
   /// check if a given geo point is in the bouding box
-  bool isGeoPointInBoudingBox(LatLng l, LatLng topLeft, LatLng bottomRight) {
+  bool isGeoPointInBoudingBox(
+      google_maps_latlng.LatLng l,
+      google_maps_latlng.LatLng topLeft,
+      google_maps_latlng.LatLng bottomRight) {
     return topLeft.latitude <= l.latitude &&
             l.latitude <= bottomRight.latitude &&
             topLeft.longitude <= l.longitude &&
@@ -185,7 +198,8 @@ class Geodesy {
 
   /// check if a given geo point is in the a polygon
   /// using even-odd rule algorithm
-  bool isGeoPointInPolygon(LatLng l, List<LatLng> polygon) {
+  bool isGeoPointInPolygon(
+      google_maps_latlng.LatLng l, List<google_maps_latlng.LatLng> polygon) {
     var isInPolygon = false;
 
     for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -206,9 +220,9 @@ class Geodesy {
   /// a given point
   ///
   /// Distance is in meters
-  List<LatLng> pointsInRange(
-      LatLng point, List<LatLng> pointsToCheck, num distance) {
-    final geoFencedPoints = <LatLng>[];
+  List<google_maps_latlng.LatLng> pointsInRange(google_maps_latlng.LatLng point,
+      List<google_maps_latlng.LatLng> pointsToCheck, num distance) {
+    final geoFencedPoints = <google_maps_latlng.LatLng>[];
     for (final p in pointsToCheck) {
       final distanceFromCenter = distanceBetweenTwoGeoPoints(point, p);
       if (distanceFromCenter <= distance) {
